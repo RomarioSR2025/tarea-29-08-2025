@@ -91,6 +91,22 @@ app.delete('/vehiculos/:id', async (req, res) => {
   }
 });
 
+app.get('/vehiculos/buscar/:placa', async (req, res) => {
+  const { placa } = req.params;
+
+  try {
+    const [rows] = await pool.query("SELECT * FROM vehiculos WHERE placa LIKE ?", [`%${placa}%`]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: "No se encontraron vehículos con esa placa" });
+    }
+
+    res.status(200).json({ success: true, data: rows });
+  } catch (error) {
+    handDbError(res, error);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor iniciado en http://localhost:${PORT}`);
 });
